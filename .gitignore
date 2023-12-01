@@ -1,0 +1,7 @@
+env_ssmnet
+ssmnet.egg-info
+__pycache__
+.DS_Store
+.vscode/
+data
+groundtruth
