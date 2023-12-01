@@ -4,7 +4,8 @@ __pycache__
 .DS_Store
 .vscode/
 data
-groundtrut# Byte-compiled / optimized / DLL files
+groundtruth
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
