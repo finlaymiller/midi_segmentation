@@ -159,7 +159,7 @@ class SsmNetDeploy:
             return
 
         plt.clf()
-        plt.imshow(hat_ssm_np, origin="lower")
+        plt.imshow(hat_ssm_np)
         plt.colorbar()
         nb_frame = hat_ssm_np.shape[0]
         plt.plot(
