@@ -57,37 +57,37 @@ def get_peaks(data: npt.NDArray[np.float64], Thalf=10, tau=1.35, distance=7):
     peaks, _ = find_peaks(peak_to_mean_v, distance=distance)
 
     # above threshold tau
-    above_treshold = np.where(peak_to_mean_v[peaks] >= tau)[0]
-    est_boundary_frame = peaks[above_treshold]
+    above_threshold = np.where(peak_to_mean_v[peaks] >= tau)[0]
 
-    return est_boundary_frame
+    return peaks[above_threshold]
 
 
 def get_boundaries(
-    hat_novelty_np: npt.NDArray[np.float64],
+    novelty: npt.NDArray[np.float64],
     time_sec_v: npt.NDArray[np.float64],
     peak_settings: Dict = {},
 ) -> Tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
-    """Estimate the boundaries
+    """Estimate the boundaries using the novelty curve.
 
     Args:
-        hat_novelty_np
-        time_sec_v
+        novelty: the novelty curve
+        time_sec_v: an array of seconds indicators
+        peak_settings: custom settings for peak detection
 
     Returns:
-        hat_boundary_sec_v,
-        hat_boundary_frame_v
+        boundary_sec_v: boundary indices in seconds
+        boundary_frame_v: boundary indices in frames
     """
     if len(peak_settings.values()) > 0:
         boundary_frame_v = get_peaks(
-            hat_novelty_np,
+            novelty,
             peak_settings["Thalf"],
             peak_settings["tau"],
             peak_settings["distance"],
         )
     else:
         boundary_frame_v = get_peaks(
-            hat_novelty_np,
+            novelty,
         )
     boundary_sec_v = time_sec_v[boundary_frame_v]
 
