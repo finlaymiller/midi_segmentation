@@ -1,0 +1,10 @@
+{
+  "parent": "id of parent sequence",
+  "section": "position in parent sequence", // e.g. third section would be 3
+  "histogram": [0.1, 0.05, ..., 0.2], // each value corresponds with A to G#
+  "tempo": 90, // calculated or estimated using hana & jasons model
+  "energy": 0.67, // some weighted combination of velocity, note freq., etc.
+  "avg_note_len": 0.8, // in seconds
+  "num_notes": 18,
+  "length": 10, // in seconds
+}
