@@ -40,7 +40,7 @@ def gen_ssm_and_novelty(
     return ssm, novelty
 
 
-def get_peaks(data: npt.NDArray[np.float64], Thalf=10, tau=1.35, distance=7):
+def get_peaks(data: npt.NDArray, Thalf=10, tau=1.35, distance=7):
     """from SSMNet"""
 
     nb_frame = len(data)
