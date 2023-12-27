@@ -3,7 +3,6 @@ ssmnet.egg-info
 __pycache__
 .DS_Store
 .vscode/
-data
 groundtruth
 # Byte-compiled / optimized / DLL files
 __pycache__/
