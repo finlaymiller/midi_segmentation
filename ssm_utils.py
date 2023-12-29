@@ -26,14 +26,17 @@ def boundary_split(array, indices):
     return subarrays
 
 
-def boundary_split_t(array, times) -> Dict:
+def boundary_split_t(array, times):
     subarrays = {}
     for t in times:
         subarrays[int(t)] = []
+    np.append(times, 999999999)
 
     for note in array:
-        for t in times:
-            if note[0] < t:
+        for i, t in enumerate(times):
+            if i == len(times) - 1:
+                break
+            if t < note.start and note.start < times[i + 1]:
                 subarrays[int(t)].append(note)
                 break
 
