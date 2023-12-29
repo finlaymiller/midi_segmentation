@@ -3,7 +3,6 @@
 import numpy as np
 from numba import jit
 from scipy import signal
-from scipy.signal import find_peaks
 
 import numpy.typing as npt
 from typing import Tuple, Dict
@@ -27,12 +26,28 @@ def boundary_split(array, indices):
     return subarrays
 
 
+def boundary_split_t(array, times) -> Dict:
+    subarrays = {}
+    for t in times:
+        subarrays[int(t)] = []
+
+    for note in array:
+        for t in times:
+            if note[0] < t:
+                subarrays[int(t)].append(note)
+                break
+
+    return subarrays
+
+
 def gen_ssm_and_novelty(
     features, L=1, filter_length=41, down_sampling=10, hop=1024, sr=44100
 ):
     features, _ = smooth_downsample_feature_sequence(
         features, sr / hop, filter_length, down_sampling
     )
+
+    print(features.shape)
 
     ssm = np.dot(np.transpose(features), features)
     novelty = compute_novelty_ssm(ssm, L, exclude=True)
@@ -51,10 +66,10 @@ def get_peaks(data: npt.NDArray, Thalf=10, tau=1.35, distance=7):
         sss = max(0, nu - Thalf)
         eee = min(nu + Thalf + 1, nb_frame)
         local_mean = np.sum(data[sss:eee]) / (eee - sss)
-        peak_to_mean_v[nu] = data[nu] / local_mean
+        peak_to_mean_v[nu] = data[nu] / local_mean if local_mean != 0 else 0
 
     # find peaks
-    peaks, _ = find_peaks(peak_to_mean_v, distance=distance)
+    peaks, _ = signal.find_peaks(peak_to_mean_v, distance=distance)
 
     # above threshold tau
     above_threshold = np.where(peak_to_mean_v[peaks] >= tau)[0]
