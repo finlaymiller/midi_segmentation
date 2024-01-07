@@ -64,6 +64,8 @@ When working with long (>1 minute) files things are a bit harder to visually par
 So for now the best bet is probably to apply the config that worked best for shorter files and trust that. Result of segmenting `data/inputs/MIDI1` can be found in `data/outputs/MIDI1`. Once segmented we can load them into ableton (hold ⌘ while dragging all segments in to a midi channel to drop them into one track sequentially). 
 <img width="1512" alt="live" src="https://github.com/finlaymiller/ssm/assets/31632894/c04cb445-7b52-4a5f-afca-b288c0a2a9c4">
 
+Note the first segment (pictured in the second track). A segment was created while the first still had notes active, which, beyond being somewhat interesting that that would happen at all, removes our ability to seamlessly play segments sequentially.
+
 Code [here](segment_midi.ipynb).
 
 #### Piano Roll
