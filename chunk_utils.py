@@ -96,3 +96,27 @@ def simultaneous_notes(
                 simultaneous_notes_counts[bin] += 1
 
     return simultaneous_notes_counts
+
+
+def energy(
+    midi: pretty_midi.PrettyMIDI,
+    w1: float = 0.5,
+    w2: float = 0.5,
+    bin_length: float = 1.0,
+):
+    num_bins = int(math.ceil(midi.get_end_time() / bin_length))
+    energies = [0.0] * num_bins
+    v = total_velocity(midi, bin_length)
+    l = average_note_length(midi)
+
+    for instrument in midi.instruments:
+        for note in instrument.notes:
+            start_bin = int(note.start // bin_length)
+            end_bin = int(note.end // bin_length)
+
+            for bin in range(start_bin, min(end_bin + 1, num_bins)):
+                energies[bin] += (
+                    w1 * (v[bin]["total_velocity"] / v[bin]["count"]) + w2 * l
+                )
+
+    return energies
