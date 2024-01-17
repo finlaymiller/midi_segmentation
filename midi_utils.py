@@ -1,18 +1,46 @@
-"""Functions used to calculate MIDI file metrics"""
-
+import os
 import math
 import pretty_midi
 import numpy as np
+from pathlib import Path
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 from typing import Dict
 
+
+def draw_midi(midi_file: str, labels: bool = False):
+    plt.style.use("dark_background")
+
+    midi = pretty_midi.PrettyMIDI(midi_file)
+
+    _, ax = plt.subplots(figsize=(12, 4))
+
+    for note in midi.instruments[0].notes:
+        rect = patches.Rectangle(
+            (note.start, note.pitch), note.end - note.start, 1, color="green"
+        )
+        ax.add_patch(rect)
+
+    if labels:
+        ax.set_xlabel("Time (s)")
+        ax.set_ylabel("MIDI Note")
+    ax.set_yticks([])
+    ax.set_title(f"{Path(midi_file).stem}")
+
+    plt.box(False)
+    plt.ylim(20, 108)  # MIDI note range for a piano
+    plt.xlim(0, np.ceil(midi.instruments[0].notes[-1].end))
+    return plt.gcf()
+
+#################################  metrics  ###################################
 ################################  all in one  #################################
 
 
 def all_metrics(midi: pretty_midi.PrettyMIDI, config) -> Dict:
     num_bins = int(math.ceil(midi.get_end_time() / config["bin_length"]))
     metrics = {
-        "pitch_histogram": midi.get_pitch_class_histogram(),
+        "pitch_histogram": list(midi.get_pitch_class_histogram()),
         "tempo": midi.estimate_tempo(),
         "file_len": midi.get_end_time(),
         "note_count": sum(len(instrument.notes) for instrument in midi.instruments),
@@ -20,19 +48,44 @@ def all_metrics(midi: pretty_midi.PrettyMIDI, config) -> Dict:
         "lengths": [0.0] * num_bins,
         "energies": [0.0] * num_bins,
         "simultaneous_counts": [0] * num_bins,
+        "key": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+        # "unique_notes": set()
+    }
+
+    notes_in_keys = {
+        "C": ['C', 'D', 'E', 'F', 'G', 'A', 'B'], # C Major
+        "C#": ['C#', 'D#', 'F', 'F#', 'G#', 'A#', 'C'], # C# (or Db) Major
+        "D": ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'], # D Major
+        "D#": ['D#', 'F', 'G', 'G#', 'A#', 'C', 'D'], # D# (or Eb) Major
+        "E": ['E', 'F#', 'G#', 'A', 'B', 'C#', 'D#'], # E Major
+        "F": ['F', 'G', 'A', 'A#', 'C', 'D', 'E'], # F Major
+        "F#": ['F#', 'G#', 'A#', 'B', 'C#', 'D#', 'F'], # F# (or Gb) Major
+        "G": ['G', 'A', 'B', 'C', 'D', 'E', 'F#'], # G Major
+        "G#": ['G#', 'A#', 'C', 'C#', 'D#', 'F', 'G'], # G# (or Ab) Major
+        "A": ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#'], # A Major
+        "A#": ['A#', 'C', 'D', 'D#', 'F', 'G', 'A'], # A# (or Bb) Major
+        "B": ['B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#'] # B Major
     }
 
     # metrics that are calculated from notes
     for instrument in midi.instruments:
         for note in instrument.notes:
+            note_name = pretty_midi.note_number_to_name(note.pitch)[:-1]
             start_bin = int(note.start // config["bin_length"])
             end_bin = int(note.end // config["bin_length"])
             metrics["lengths"].append(note.end - note.start)
+            # metrics["unique_notes"].add(pretty_midi.note_number_to_name(note.pitch)[:-1])
+
 
             for bin in range(start_bin, min(end_bin + 1, num_bins)):
                 metrics["velocities"][bin]["total_velocity"] += note.velocity
                 metrics["velocities"][bin]["count"] += 1
                 metrics["simultaneous_counts"][bin] += 1
+
+            # key
+            for k in metrics["key"]:
+                if note_name not in notes_in_keys[k]:
+                    metrics["key"].remove(k)
 
     metrics["lengths"] = sum(metrics["lengths"]) / len(metrics["lengths"])
 
@@ -41,6 +94,7 @@ def all_metrics(midi: pretty_midi.PrettyMIDI, config) -> Dict:
         config["w1"] * (vel["total_velocity"] / vel["count"])
         + config["w2"] * metrics["lengths"]
         for vel in metrics["velocities"]
+        if vel["count"] > 0
     ]
 
     return metrics
