@@ -1,3 +1,4 @@
+data/outputs
 env_ssmnet
 ssmnet.egg-info
 __pycache__
