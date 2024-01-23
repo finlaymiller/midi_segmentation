@@ -33,6 +33,14 @@ def draw_midi(midi_file: str, labels: bool = False):
     plt.xlim(0, np.ceil(midi.instruments[0].notes[-1].end))
     return plt.gcf()
 
+def draw_histogram(histogram, title='Pitch Histogram'):
+    plt.bar(range(12), histogram)
+    plt.ylabel('Frequency')
+    plt.title(title)
+    plt.xticks(range(12), ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'])
+    plt.show()
+
+
 #################################  metrics  ###################################
 ################################  all in one  #################################
 
@@ -40,7 +48,7 @@ def draw_midi(midi_file: str, labels: bool = False):
 def all_metrics(midi: pretty_midi.PrettyMIDI, config) -> Dict:
     num_bins = int(math.ceil(midi.get_end_time() / config["bin_length"]))
     metrics = {
-        "pitch_histogram": list(midi.get_pitch_class_histogram()),
+        "pitch_histogram": list(midi.get_pitch_class_histogram(use_duration=config.ph_weight_dur, use_velocity=config.ph_weight_vel)),
         "tempo": midi.estimate_tempo(),
         "file_len": midi.get_end_time(),
         "note_count": sum(len(instrument.notes) for instrument in midi.instruments),

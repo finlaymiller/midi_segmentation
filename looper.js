@@ -70,7 +70,7 @@ function findMostSimilarVector(targetVector, vectorArray) {
   var mostSimilarVector = null;
   var highestSimilarity = -1;  // since cosine similarity ranges from -1 to 1
 
-  vectorArray.forEach((vectorData) => {
+  vectorArray.map(vectorData => {
 	post(vectorData);
 	
     const { name, vector } = vectorData;
