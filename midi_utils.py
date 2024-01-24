@@ -8,7 +8,9 @@ import matplotlib.patches as patches
 
 from typing import Dict
 
+plt.style.use("dark_background")
 
+#################################  plotting  ##################################
 def draw_midi(midi_file: str, labels: bool = False):
     plt.style.use("dark_background")
 
@@ -40,6 +42,19 @@ def draw_histogram(histogram, title='Pitch Histogram'):
     plt.xticks(range(12), ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'])
     plt.show()
 
+def draw_piano_roll(piano_roll, fs=100, title='Piano Roll'):
+    plt.figure(figsize=(12, 8))
+    plt.imshow(piano_roll, aspect='auto', origin='lower', cmap='magma', interpolation='nearest')
+    plt.title(title)
+    plt.xlabel('Time (seconds)')
+    plt.ylabel('MIDI Note Number')
+    plt.colorbar()
+
+    tick_spacing = 1
+    ticks = np.arange(0, len(piano_roll.T) / fs, tick_spacing)
+    plt.xticks(ticks * fs, labels=[f"{tick:.1f}" for tick in ticks])
+
+    plt.show()
 
 #################################  metrics  ###################################
 ################################  all in one  #################################
