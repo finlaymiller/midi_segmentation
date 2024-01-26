@@ -260,3 +260,51 @@ def energy(
 
 def norm(data):
     return (data - np.min(data)) / (np.max(data) - np.min(data))
+
+
+#################################  random  ###################################
+def quantize_midi(filename, sections_per_beat):
+    """
+    Quantizes a MIDI file into sections_per_beat sections per beat.
+
+    Args:
+    midi_file_path (str): Path to the MIDI file.
+    sections_per_beat (int): Number of quantization sections per beat.
+
+    Returns:
+    pretty_midi.PrettyMIDI: A quantized PrettyMIDI object.
+    """
+    midi_data = pretty_midi.PrettyMIDI(filename)
+    bpm = int(filename.split('-')[1])
+    section_duration = 60.0 / bpm / sections_per_beat
+
+    for instrument in midi_data.instruments:
+        for note in instrument.notes:
+            note.start = round(note.start / section_duration) * section_duration
+            note.end = round(note.end / section_duration) * section_duration
+
+    return midi_data
+
+
+def trim_piano_roll(piano_roll):
+    """
+    Trims the piano roll by removing rows above the highest note and below the
+    lowest note.
+
+    Args:
+    piano_roll (np.array): A 2D NumPy array representing the piano roll.
+
+    Returns:
+    np.array: The trimmed piano roll.
+    """
+    non_zero_rows = np.where(np.any(piano_roll > 0, axis=1))[0]
+
+    if non_zero_rows.size == 0:
+        return piano_roll
+
+    lowest_note = non_zero_rows.min()
+    highest_note = non_zero_rows.max()
+
+    trimmed_piano_roll = piano_roll[lowest_note:highest_note+1, :]
+
+    return trimmed_piano_roll
