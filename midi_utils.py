@@ -286,13 +286,17 @@ def quantize_midi(filename, sections_per_beat):
     return midi_data
 
 
-def trim_piano_roll(piano_roll):
+def trim_piano_roll(piano_roll, min=None, max=None):
     """
     Trims the piano roll by removing rows above the highest note and below the
     lowest note.
 
     Args:
     piano_roll (np.array): A 2D NumPy array representing the piano roll.
+    min (int): The note to remove everything below. If none is provided, the 
+    lowest note in the roll will be used
+    max (int): The note to remove everything above. If none is provided, the 
+    highest note in the roll will be used
 
     Returns:
     np.array: The trimmed piano roll.
@@ -302,8 +306,8 @@ def trim_piano_roll(piano_roll):
     if non_zero_rows.size == 0:
         return piano_roll
 
-    lowest_note = non_zero_rows.min()
-    highest_note = non_zero_rows.max()
+    lowest_note = non_zero_rows.min() if min is None else min
+    highest_note = non_zero_rows.max() if max is None else max
 
     trimmed_piano_roll = piano_roll[lowest_note:highest_note+1, :]
 
