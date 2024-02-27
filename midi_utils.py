@@ -58,7 +58,7 @@ def draw_piano_roll(piano_roll, fs=100, title='Piano Roll'):
 
 #################################  metrics  ###################################
 ################################  all in one  #################################
-
+# TODO add manually-calculated "valid tempo range"
 
 def all_metrics(midi: pretty_midi.PrettyMIDI, config) -> Dict:
     num_bins = int(math.ceil(midi.get_end_time() / config["bin_length"]))
@@ -72,7 +72,7 @@ def all_metrics(midi: pretty_midi.PrettyMIDI, config) -> Dict:
         "energies": [0.0] * num_bins,
         "simultaneous_counts": [0] * num_bins,
         "key": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
-        # "unique_notes": set()
+        # "unique_notes": set() # removed, modify to be able to write to JSON
     }
 
     notes_in_keys = {
