@@ -8,8 +8,6 @@ import matplotlib.patches as patches
 
 from typing import Dict
 
-plt.style.use("dark_background")
-
 #################################  plotting  ##################################
 def draw_midi(midi_file: str, labels: bool = False):
     plt.style.use("dark_background")
@@ -36,6 +34,7 @@ def draw_midi(midi_file: str, labels: bool = False):
     return plt.gcf()
 
 def draw_histogram(histogram, title='Pitch Histogram'):
+    plt.style.use("dark_background")
     plt.bar(range(12), histogram)
     plt.ylabel('Frequency')
     plt.title(title)
@@ -43,6 +42,7 @@ def draw_histogram(histogram, title='Pitch Histogram'):
     plt.show()
 
 def draw_piano_roll(piano_roll, fs=100, title='Piano Roll'):
+    plt.style.use("dark_background")
     plt.figure(figsize=(12, 8))
     plt.imshow(piano_roll, aspect='auto', origin='lower', cmap='magma', interpolation='nearest')
     plt.title(title)
@@ -63,7 +63,7 @@ def draw_piano_roll(piano_roll, fs=100, title='Piano Roll'):
 def all_metrics(midi: pretty_midi.PrettyMIDI, config) -> Dict:
     num_bins = int(math.ceil(midi.get_end_time() / config["bin_length"]))
     metrics = {
-        "pitch_histogram": list(midi.get_pitch_class_histogram(use_duration=config.ph_weight_dur, use_velocity=config.ph_weight_vel)),
+        "pitch_histogram": list(midi.get_pitch_class_histogram(use_duration=config["ph_weight_dur"], use_velocity=config["ph_weight_vel"])),
         "tempo": midi.estimate_tempo(),
         "file_len": midi.get_end_time(),
         "note_count": sum(len(instrument.notes) for instrument in midi.instruments),
